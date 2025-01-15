@@ -17,41 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     <textarea  type="text" class="form-control" id="test-description" name="test-description" placeholder="Введіть опис тесту"></textarea>    
   </div>`;
 
-  // const titleDiv = document.createElement("div");
-  // titleDiv.className = "mb-3";
-
-  // const titleLabel = document.createElement("label");
-  // titleLabel.textContent = "Назва тесту: ";
-  // titleLabel.className = "form-label";
-  // const titleInput = document.createElement("input");
-  // titleInput.type = "text";
-  // titleInput.name = "test-title";
-  // titleInput.className = "form-control";
-  // titleInput.placeholder = "Введіть назву тесту";
-  // titleInput.required = true;
-  // titleLabel.appendChild(titleInput);
-  // titleDiv.appendChild(titleLabel);
-
-  // const descriptionDiv = document.createElement("div");
-  // descriptionDiv.className = "mb-3";
-  // const descriptionLabel = document.createElement("label");
-  // descriptionLabel.textContent = "Опис тесту: ";
-  // descriptionLabel.className = "form-label";
-  // const descriptionInput = document.createElement("textarea");
-  // descriptionInput.name = "test-description";
-  // descriptionInput.className = "form-control";
-  // descriptionInput.placeholder = "Введіть опис тесту";
-  // descriptionInput.required = true;
-  // descriptionLabel.appendChild(descriptionInput);
-  // descriptionDiv.appendChild(descriptionLabel);
-
-  // Контейнер для запитань
-
-  // questionHTML = `<div class="input-group mb-3">
-  //   <label for="question-1-text" class="form-label">Запитання 1</label>
-  //   <input type="text" class="form-control" id="question-1-text" name="question-1-text" placeholder="Введіть текст запитання">
-  //   </div>`;
-
   const questionsContainer = document.createElement("div");
   questionsContainer.id = "questions";
 
@@ -63,20 +28,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
-  submitButton.className = "btn btn-primary";
+  submitButton.className = "btn btn-success";
   submitButton.textContent = "Зберегти тест";
 
-  // form.appendChild(titleDiv);
-  // form.appendChild(descriptionDiv);
   form.innerHTML = titleHTML + descriptionHTML;
-  // form.appendChild(descriptionLabel);
+
+  const resultsContainer = document.createElement("div");
+  resultsContainer.id = "results-container";
+
+  const addResultButton = document.createElement("button");
+  addResultButton.textContent = "Додати результат";
+  addResultButton.className = "btn btn-primary me-3";
+  addResultButton.addEventListener("click", addResult);
+
   form.appendChild(questionsContainer);
+  form.appendChild(resultsContainer);
   form.appendChild(addQuestionButton);
+  form.appendChild(addResultButton);
   form.appendChild(submitButton);
+  form.addEventListener("submit", handleSubmit);
 
   app.appendChild(form);
 
   let questionIndex = 0;
+  let resultIndex = 0;
+
+  // Додає перше запитання за замовчуванням
+  addQuestion();
+
+  // Додає перший результат
+  addResult();
 
   // Додає нове запитання до форми
   function addQuestion() {
@@ -141,27 +122,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const answerInput = document.createElement("input");
     answerInput.type = "text";
-    answerInput.className = "form-control";
+    answerInput.className = "form-control flex-grow-1";
     answerInput.name = `${questionId}-answer-${answerIndex}-text`;
     answerInput.id = `${questionId}-answer-${answerIndex}-text`;
     answerInput.placeholder = "Введіть текст відповіді";
     answerInput.required = true;
 
     const weightLabel = document.createElement("label");
-    weightLabel.textContent = " Вага: ";
+    weightLabel.textContent = "Вага: ";
     weightLabel.className = "input-group-text";
     weightLabel.htmlFor = `${questionId}-answer-${answerIndex}-weight`;
 
     const weightInput = document.createElement("input");
     weightInput.type = "number";
-    weightInput.className = "form-control shrink-0 ";
+    weightInput.className = "form-control flex-grow-0";
     weightInput.name = `${questionId}-answer-${answerIndex}-weight`;
     weightInput.id = `${questionId}-answer-${answerIndex}-weight`;
     weightInput.placeholder = "Введіть вагу";
     weightInput.min = 0;
     weightInput.defaultValue = 0;
     weightInput.required = true;
-    weightInput.style.width = "50px";
+    weightInput.style.width = "80px";
 
     const removeAnswerButton = document.createElement("button");
     removeAnswerButton.type = "button";
@@ -179,14 +160,91 @@ document.addEventListener("DOMContentLoaded", () => {
     answersContainer.appendChild(answerDiv);
   }
 
+  function addResult() {
+    const resultId = `result_${resultIndex}`;
+
+    const resultDiv = document.createElement("div");
+    resultDiv.className = "border p-3 mb-3 bg-light rounded";
+
+    const scoreDiv = document.createElement("div");
+    scoreDiv.className = "input-group mb-3";
+
+    const scoreLabel = document.createElement("p");
+    scoreLabel.className = "form-label";
+    scoreLabel.textContent = "Кількість балів: ";
+
+    const minScoreLabel = document.createElement("label");
+    minScoreLabel.textContent = "Від: ";
+    minScoreLabel.className = "input-group-text";
+    minScoreLabel.htmlFor = `${resultId}-score_min`;
+
+    const minScoreInput = document.createElement("input");
+    minScoreInput.type = "number";
+    minScoreInput.placeholder = "Мінімальна кількість балів";
+    minScoreInput.className = "form-control";
+    minScoreInput.name = `${resultId}-score_min`;
+    minScoreInput.id = `${resultId}-score_min`;
+
+    const maxScoreLabel = document.createElement("label");
+    maxScoreLabel.textContent = "До: ";
+    maxScoreLabel.className = "input-group-text";
+    maxScoreLabel.htmlFor = `${resultId}-score_max`;
+
+    const maxScoreInput = document.createElement("input");
+    maxScoreInput.type = "number";
+    maxScoreInput.placeholder = "Максимальна кількість балів";
+    maxScoreInput.className = "form-control";
+    maxScoreInput.name = `${resultId}-score_max`;
+    maxScoreInput.id = `${resultId}-score_max`;
+
+    const resultTextLabel = document.createElement("label");
+    resultTextLabel.textContent = "Опис результату: ";
+    resultTextLabel.className = "form-label";
+    resultTextLabel.htmlFor = `${resultId}-text`;
+
+    const resultTextInput = document.createElement("textarea");
+    resultTextInput.placeholder = "Опис результату";
+    resultTextInput.className = "form-control mb-3";
+    resultTextInput.name = `${resultId}-text`;
+    resultTextInput.id = `${resultId}-text`;
+
+    const removeResultButton = document.createElement("button");
+    removeResultButton.textContent = "Видалити результат";
+    removeResultButton.className = "btn btn-danger";
+    removeResultButton.addEventListener("click", () => {
+      resultDiv.remove();
+    });
+
+    scoreDiv.appendChild(minScoreLabel);
+    scoreDiv.appendChild(minScoreInput);
+    scoreDiv.appendChild(maxScoreLabel);
+    scoreDiv.appendChild(maxScoreInput);
+
+    resultDiv.appendChild(scoreLabel);
+    resultDiv.appendChild(scoreDiv);
+    resultDiv.appendChild(resultTextLabel);
+    resultDiv.appendChild(resultTextInput);
+    resultDiv.appendChild(removeResultButton);
+    resultsContainer.appendChild(resultDiv);
+
+    resultIndex++;
+  }
+
   // Обробляє відправку форми
-  form.addEventListener("submit", function (event) {
+
+  function handleSubmit(event) {
     event.preventDefault();
 
     const formData = new FormData(form);
-    const test = { questions: [] };
+    const test = { questions: [], results: [] };
 
     formData.forEach((value, key) => {
+      if (key === "test-title") {
+        test.title = value;
+      } else if (key === "test-description") {
+        test.description = value;
+      }
+
       const [question, part, index, field] = key.split("-");
 
       // Визначаємо індекс запитання
@@ -224,16 +282,36 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
       }
+
+      // Визначаємо індекс результату
+      if (question.startsWith("result")) {
+        const resultIndex = parseInt(question.replace("result_", ""), 10);
+
+        // Ініціалізуємо результат, якщо він ще не існує
+        if (!test.results[resultIndex]) {
+          test.results[resultIndex] = { text: "", minScore: 0, maxScore: 0 };
+        }
+
+        // Якщо це текст результату
+        if (part === "text") {
+          test.results[resultIndex].text = value;
+        }
+
+        // Якщо це бали
+        if (part === "score_min") {
+          test.results[resultIndex].minScore = parseInt(value, 10);
+        }
+        if (part === "score_max") {
+          test.results[resultIndex].maxScore = parseInt(value, 10);
+        }
+      }
     });
 
-    // Видаляємо порожні запитання
-    test.questions = test.questions.filter(Boolean);
+    // Видаляємо порожні результати
+    test.results = test.results.filter(Boolean);
 
     // Виводимо результат
     console.log("JSON:", JSON.stringify(test, null, 2));
     alert("Тест збережено! Перевірте консоль для JSON.");
-  });
-
-  // Додає перше запитання за замовчуванням
-  addQuestion();
+  }
 });
