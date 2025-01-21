@@ -1,117 +1,160 @@
 document.addEventListener("DOMContentLoaded", () => {
   // JSON тесту
-  const testJSON = {
-    title: "Мій тест",
-    description: "Це приклад тесту.",
-    questions: [
-      {
-        text: "Що таке JavaScript?",
-        answers: [
-          { text: "Мова програмування", weight: 10 },
-          { text: "Фреймворк", weight: 0 },
-          { text: "База даних", weight: 0 },
-        ],
-      },
-      {
-        text: "Для чого використовується HTML?",
-        answers: [
-          { text: "Для стилізації сторінки", weight: 0 },
-          { text: "Для структурування сторінки", weight: 10 },
-          { text: "Для обробки запитів", weight: 0 },
-        ],
-      },
-    ],
-  };
+  // const testJSON = {
+  //   title: "Мій тест",
+  //   description: "Це приклад тесту.",
+  //   questions: [
+  //     {
+  //       text: "Що таке JavaScript?",
+  //       answers: [
+  //         { text: "Мова програмування", weight: 10 },
+  //         { text: "Фреймворк", weight: 0 },
+  //         { text: "База даних", weight: 0 },
+  //       ],
+  //     },
+  //     {
+  //       text: "Для чого використовується HTML?",
+  //       answers: [
+  //         { text: "Для стилізації сторінки", weight: 0 },
+  //         { text: "Для структурування сторінки", weight: 10 },
+  //         { text: "Для обробки запитів", weight: 0 },
+  //       ],
+  //     },
+  //   ],
+  //   results: [
+  //     {
+  //       maxScore: 9,
+  //       minScore: 0,
+  //       text: "Ні, Ви не Близнюки! Може, у Вас біологічний годинник зламався?\n",
+  //     },
+  //     {
+  //       maxScore: 19,
+  //       minScore: 10,
+  //       text: "Може, Ви і Близнюки, але не дуже близнюкові!\n",
+  //     },
+  //     {
+  //       maxScore: 21,
+  //       minScore: 20,
+  //       text: "Ви - справжні Близнюки!",
+  //     },
+  //   ],
+  // };
 
-  const app = document.getElementById("app");
+  const testId = 1;
 
-  // Створення елементів заголовку та опису
-  const title = document.createElement("h1");
-  title.textContent = testJSON.title;
-  const description = document.createElement("p");
-  description.textContent = testJSON.description;
+  fetch(`http://localhost:4000/api/tests/${testId}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Server response:", data);
+      const testJSON = data.post;
 
-  const form = document.createElement("form");
-  form.id = "testForm";
+      const app = document.getElementById("app");
 
-  // Генерація запитань та відповідей
-  testJSON.questions.forEach((question, questionIndex) => {
-    const questionDiv = document.createElement("div");
-    questionDiv.className = "border bg-light rounded p-3 mb-3";
+      // Створення елементів заголовку та опису
+      const title = document.createElement("h1");
+      title.textContent = testJSON.title;
+      const description = document.createElement("p");
+      description.textContent = testJSON.description;
 
-    const questionText = document.createElement("p");
-    questionText.textContent = `${questionIndex + 1}. ${question.text}`;
-    questionText.className = "mb-2 fs-5";
-    questionDiv.appendChild(questionText);
+      const form = document.createElement("form");
+      form.id = "testForm";
 
-    question.answers.forEach((answer, answerIndex) => {
-      const answerDiv = document.createElement("div");
-      answerDiv.className = "form-check";
+      // Генерація запитань та відповідей
+      testJSON.questions.forEach((question, questionIndex) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "border bg-light rounded p-3 mb-3";
 
-      const answerInput = document.createElement("input");
-      answerInput.type = "radio";
-      answerInput.name = `question-${questionIndex}`;
-      answerInput.id = `question-${questionIndex}-answer-${answerIndex}`;
-      answerInput.value = answer.weight;
-      answerInput.required = true;
-      answerInput.className = "form-check-input";
+        const questionText = document.createElement("p");
+        questionText.textContent = `${questionIndex + 1}. ${question.text}`;
+        questionText.className = "mb-2 fs-5";
+        questionDiv.appendChild(questionText);
 
-      const answerLabel = document.createElement("label");
-      answerLabel.textContent = answer.text;
-      answerLabel.htmlFor = `question-${questionIndex}-answer-${answerIndex}`;
-      answerLabel.className = "form-check-label";
+        question.answers.forEach((answer, answerIndex) => {
+          const answerDiv = document.createElement("div");
+          answerDiv.className = "form-check";
 
-      answerDiv.appendChild(answerInput);
-      answerDiv.appendChild(answerLabel);
+          const answerInput = document.createElement("input");
+          answerInput.type = "radio";
+          answerInput.name = `question-${questionIndex}`;
+          answerInput.id = `question-${questionIndex}-answer-${answerIndex}`;
+          answerInput.value = answer.weight;
+          answerInput.required = true;
+          answerInput.className = "form-check-input";
 
-      questionDiv.appendChild(answerDiv);
-    });
+          const answerLabel = document.createElement("label");
+          answerLabel.textContent = answer.text;
+          answerLabel.htmlFor = `question-${questionIndex}-answer-${answerIndex}`;
+          answerLabel.className = "form-check-label";
 
-    form.appendChild(questionDiv);
-  });
+          answerDiv.appendChild(answerInput);
+          answerDiv.appendChild(answerLabel);
 
-  const submitButton = document.createElement("button");
-  submitButton.type = "submit";
-  submitButton.id = "submit-button";
-  submitButton.textContent = "Завершити тест";
-  submitButton.className = "btn btn-primary";
+          questionDiv.appendChild(answerDiv);
+        });
 
-  form.appendChild(submitButton);
+        form.appendChild(questionDiv);
+      });
 
-  // Обробка результатів тесту
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+      const submitButton = document.createElement("button");
+      submitButton.type = "submit";
+      submitButton.id = "submit-button";
+      submitButton.textContent = "Завершити тест";
+      submitButton.className = "btn btn-primary";
 
-    const formData = new FormData(form);
-    let totalScore = 0;
+      form.appendChild(submitButton);
 
-    formData.forEach((value) => {
-      totalScore += parseInt(value, 10);
-    });
+      // Обробка результатів тесту
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
 
-    const resultDivOld = document.getElementById("result-div");
-    if (resultDivOld) resultDivOld.remove();
+        const formData = new FormData(form);
+        let totalScore = 0;
 
-    const resultDiv = document.createElement("div");
-    resultDiv.className =
-      "border border-success bg-light rounded p-3 mb-3 mt-3";
-    resultDiv.id = "result-div";
+        formData.forEach((value) => {
+          totalScore += parseInt(value, 10);
+        });
 
-    const result = document.createElement("p");
-    result.className = "fs-5 mb-2";
-    result.textContent = `Ваш результат: ${totalScore} балів`;
-    // app.appendChild(result);
+        const resultDivOld = document.getElementById("result-div");
+        if (resultDivOld) resultDivOld.remove();
 
-    resultDiv.appendChild(result);
-    const submitButton = document.getElementById("submit-button");
-    submitButton.insertAdjacentElement("beforebegin", resultDiv);
+        const resultDiv = document.createElement("div");
+        resultDiv.className =
+          "border border-success bg-light rounded p-3 mb-3 mt-3";
+        resultDiv.id = "result-div";
 
-    // form.appendChild(resultDiv);
-    // form.remove();
-  });
+        const resultScore = document.createElement("p");
+        resultScore.className = "fs-5 mb-2";
+        resultScore.textContent = `Ви набрали: ${totalScore} балів.`;
 
-  // Додавання всіх елементів до сторінки
-  app.appendChild(title);
-  app.appendChild(description);
-  app.appendChild(form);
+        const resultText = document.createElement("p");
+        resultText.className = "fs-5 mb-2";
+
+        let resultTextContent = "";
+        testJSON.results.forEach((result) => {
+          if (totalScore >= result.minScore && totalScore <= result.maxScore) {
+            resultTextContent = result.text;
+          }
+        });
+
+        resultText.textContent = resultTextContent;
+
+        resultDiv.appendChild(resultScore);
+        resultDiv.appendChild(resultText);
+
+        const submitButton = document.getElementById("submit-button");
+        submitButton.insertAdjacentElement("beforebegin", resultDiv);
+
+        // form.appendChild(resultDiv);
+        // form.remove();
+      });
+
+      // Додавання всіх елементів до сторінки
+      app.appendChild(title);
+      app.appendChild(description);
+      app.appendChild(form);
+    })
+    .catch((error) => console.error("Error:", error));
 });

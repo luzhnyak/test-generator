@@ -312,6 +312,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Виводимо результат
     console.log("JSON:", JSON.stringify(test, null, 2));
+
+    fetch("/api/tests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(test),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log("Server response:", data))
+      .catch((error) => console.error("Error:", error));
     alert("Тест збережено! Перевірте консоль для JSON.");
   }
 });
